@@ -6,9 +6,10 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 
-	"../helpers"
-	context_setup "github.com/cloudfoundry-incubator/cf-test-helpers/services/context_setup"
 	"testing"
+
+	context_setup "github.com/cloudfoundry-incubator/cf-test-helpers/services/context_setup"
+	"github.com/cloudfoundry-incubator/riakcs-acceptance-tests/helpers"
 )
 
 func TestServices(t *testing.T) {
