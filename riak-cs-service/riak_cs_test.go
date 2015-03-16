@@ -56,7 +56,7 @@ var _ = Describe("Riak CS Service Lifecycle", func() {
 		runner.NewCmdRunner(runner.Curl("-X", "DELETE", "-k", delete_uri), shortTimeout).WithOutput("successfully_deleted").Run()
 		fmt.Println("\n")
 
-		runner.NewCmdRunner(Cf("unbind-service", AppName, ServiceInstanceName), longTimeout)
-		runner.NewCmdRunner(Cf("delete-service", "-f", ServiceInstanceName), longTimeout)
+		runner.NewCmdRunner(Cf("unbind-service", AppName, ServiceInstanceName), longTimeout).Run()
+		runner.NewCmdRunner(Cf("delete-service", "-f", ServiceInstanceName), longTimeout).Run()
 	})
 })
