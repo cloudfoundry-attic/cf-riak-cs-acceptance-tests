@@ -19,7 +19,7 @@ var _ = Describe("Riak CS Service Lifecycle", func() {
 	)
 
 	BeforeEach(func() {
-		shortTimeout = ScaledTimeout(10 * time.Second)
+		shortTimeout = ScaledTimeout(30 * time.Second)
 		longTimeout = ScaledTimeout(60 * time.Second)
 		startTimeout = ScaledTimeout(5 * time.Minute)
 
