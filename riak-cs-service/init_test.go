@@ -1,46 +1,39 @@
 package riak_cs_service
 
 import (
-	. "github.com/cloudfoundry-incubator/cf-test-helpers/runner"
 	. "github.com/onsi/ginkgo"
+	ginkgoconfig "github.com/onsi/ginkgo/config"
+	"github.com/onsi/ginkgo/reporters"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
 
+	"fmt"
 	"testing"
 
-	context_setup "github.com/cloudfoundry-incubator/cf-test-helpers/services/context_setup"
+	"github.com/cloudfoundry-incubator/cf-test-helpers/services"
 	"github.com/cloudfoundry-incubator/riakcs-acceptance-tests/helpers"
 )
 
-func TestServices(t *testing.T) {
-	context_setup.TimeoutScale = RiakCSIntegrationConfig.TimeoutScale
+var TestConfig helpers.RiakCSIntegrationConfig
+var TestContext services.Context
 
-	context_setup.SetupEnvironment(context_setup.NewContext(RiakCSIntegrationConfig.IntegrationConfig, "RiakCSATS"))
+func TestServices(t *testing.T) {
+	var err error
+	TestConfig, err = helpers.LoadConfig()
+	if err != nil {
+		panic("Loading config: " + err.Error())
+	}
+
+	err = helpers.ValidateConfig(&TestConfig)
+	if err != nil {
+		panic("Validating config: " + err.Error())
+	}
+
+	TestContext = services.NewContext(TestConfig.Config, "RiakCSATS")
+
+	BeforeEach(TestContext.Setup)
+	AfterEach(TestContext.Teardown)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Riak CS Services Suite")
+	junitReporter := reporters.NewJUnitReporter(fmt.Sprintf("junit_%d.xml", ginkgoconfig.GinkgoConfig.ParallelNode))
+	RunSpecsWithDefaultAndCustomReporters(t, "RiakCS Acceptance Tests", []Reporter{junitReporter})
 }
-
-func AppUri(appname string) string {
-	return RiakCSIntegrationConfig.RiakCsScheme + appname + "." + RiakCSIntegrationConfig.AppsDomain
-}
-
-func Curling(args ...string) func() *gexec.Session {
-	return func() *gexec.Session {
-		return Curl(args...)
-	}
-}
-
-func ServiceName() string {
-	return RiakCSIntegrationConfig.ServiceName
-}
-
-func PlanName() string {
-	return RiakCSIntegrationConfig.PlanName
-}
-
-var RiakCSIntegrationConfig = helpers.LoadConfig()
-
-var AppName = ""
-
-var sinatraPath = "../assets/app_sinatra_service"

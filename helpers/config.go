@@ -1,74 +1,63 @@
 package helpers
 
 import (
-	"encoding/json"
+	"fmt"
 	"os"
 
-	. "github.com/cloudfoundry-incubator/cf-test-helpers/services/context_setup"
+	"github.com/cloudfoundry-incubator/cf-test-helpers/services"
 )
 
 type RiakCSIntegrationConfig struct {
-	IntegrationConfig
+	services.Config
 
-	RiakCsHost				string `json:"riak_cs_host"`
-	RiakCsScheme      string `json:"riak_cs_scheme"`
-	ServiceName				string `json:"service_name"`
-	PlanName					string `json:"plan_name"`
-	BrokerHost				string `json:"broker_host"`
+	RiakCsHost   string `json:"riak_cs_host"`
+	RiakCsScheme string `json:"riak_cs_scheme"`
+	ServiceName  string `json:"service_name"`
+	PlanName     string `json:"plan_name"`
+	BrokerHost   string `json:"broker_host"`
 }
 
-func LoadConfig() (config RiakCSIntegrationConfig) {
+func (c RiakCSIntegrationConfig) AppURI(appname string) string {
+	return c.RiakCsScheme + appname + "." + c.AppsDomain
+}
+
+func LoadConfig() (RiakCSIntegrationConfig, error) {
+	config := RiakCSIntegrationConfig{}
+
 	path := os.Getenv("CONFIG")
 	if path == "" {
-		panic("Must set $CONFIG to point to an integration config .json file.")
+		return config, fmt.Errorf("Must set $CONFIG to point to an integration config .json file.")
 	}
 
-	return LoadPath(path)
+	err := services.LoadConfig(path, &config)
+	if err != nil {
+		return config, fmt.Errorf("Loading config: %s", err.Error())
+	}
+
+	return config, nil
 }
 
-func LoadPath(path string) (config RiakCSIntegrationConfig) {
-	configFile, err := os.Open(path)
+func ValidateConfig(config *RiakCSIntegrationConfig) error {
+	err := services.ValidateConfig(&config.Config)
 	if err != nil {
-		panic(err)
-	}
-
-	decoder := json.NewDecoder(configFile)
-	err = decoder.Decode(&config)
-	if err != nil {
-		panic(err)
-	}
-
-	if config.ApiEndpoint == "" {
-		panic("missing configuration 'api'")
-	}
-
-	if config.AdminUser == "" {
-		panic("missing configuration 'admin_user'")
-	}
-
-	if config.ApiEndpoint == "" {
-		panic("missing configuration 'admin_password'")
+		return err
 	}
 
 	if config.ServiceName == "" {
-		panic("missing configuration 'service_name'")
+		return fmt.Errorf("Field 'service_name' must not be empty")
 	}
 
 	if config.PlanName == "" {
-		panic("missing configuration 'plan_name'")
+		return fmt.Errorf("Field 'plan_name' must not be empty")
 	}
 
 	if config.BrokerHost == "" {
-		panic("missing configuration 'broker_host'")
+		return fmt.Errorf("Field 'broker_host' must not be empty")
 	}
 
 	if config.RiakCsHost == "" {
-		panic("missing configuration 'riak_cs_host'")
+		return fmt.Errorf("Field 'riak_cs_host' must not be empty")
 	}
 
-	if config.TimeoutScale <= 0 {
-		config.TimeoutScale = 1
-	}
-
-	return
+	return nil
 }
