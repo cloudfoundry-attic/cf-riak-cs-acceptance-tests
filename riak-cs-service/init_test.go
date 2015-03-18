@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/cloudfoundry-incubator/cf-riak-cs-acceptance-tests/helpers"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/services"
-	"github.com/cloudfoundry-incubator/riakcs-acceptance-tests/helpers"
 )
 
 var TestConfig helpers.RiakCSIntegrationConfig
