@@ -10,11 +10,12 @@ import (
 type RiakCSIntegrationConfig struct {
 	services.Config
 
-	RiakCsHost   string `json:"riak_cs_host"`
-	RiakCsScheme string `json:"riak_cs_scheme"`
-	ServiceName  string `json:"service_name"`
-	PlanName     string `json:"plan_name"`
-	BrokerHost   string `json:"broker_host"`
+	RiakCsHost     string `json:"riak_cs_host"`
+	RiakCsScheme   string `json:"riak_cs_scheme"`
+	ServiceName    string `json:"service_name"`
+	PlanName       string `json:"plan_name"`
+	BrokerHost     string `json:"broker_host"`
+	BrokerProtocol string `json:"broker_protocol"`
 }
 
 func (c RiakCSIntegrationConfig) AppURI(appname string) string {
@@ -57,6 +58,10 @@ func ValidateConfig(config *RiakCSIntegrationConfig) error {
 
 	if config.RiakCsHost == "" {
 		return fmt.Errorf("Field 'riak_cs_host' must not be empty")
+	}
+
+	if config.BrokerProtocol == "" {
+		config.BrokerProtocol = "https"
 	}
 
 	return nil

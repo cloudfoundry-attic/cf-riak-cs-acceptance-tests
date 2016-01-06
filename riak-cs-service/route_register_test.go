@@ -15,7 +15,7 @@ var _ = Describe("Riak CS Nodes Register a Route", func() {
 
 var _ = Describe("Riak Broker Registers a Route", func() {
 	It("Allows users to access the riak-cs broker using a url", func() {
-		endpointURL := "https://" + TestConfig.BrokerHost + "/v2/catalog"
+		endpointURL := TestConfig.BrokerProtocol + "://" + TestConfig.BrokerHost + "/v2/catalog"
 
 		// check for 401 because it means we reached the endpoint, but did not supply credentials.
 		// a failure would be a 404
